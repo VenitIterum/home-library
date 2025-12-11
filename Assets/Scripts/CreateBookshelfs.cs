@@ -2,49 +2,68 @@ using NUnit.Framework;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using ScriptableSettings;
+using System.Collections.Generic;
 
 public class CreateBookshelfs : MonoBehaviour
 {
-[SerializeField]
+    [SerializeField]
     private int bookCount = 26;
 
     [SerializeField]
-    private Transform bookcaseParent;
-
-    [SerializeField]
-    private GameObject bookshelfPrefab;
+    private Transform room;
 
     [SerializeField]
     private GameObject bookPrefab;
 
+    [SerializeField]
+    private List<GameObject> placesForBooksList;
+
+
     private void Start()
     {
-        float coordinateNewBookshelf = 0.0f;
-        int bookshelfsCount = ((bookCount - (bookCount % 10)) / 10) +1;
-        int count = 0;
-        int randomCountBooksOnBookShelfs = 0;
+        SpawnPoints placesForBooksGetSpawn = null;
+        int countBooksInPlace = 0;
 
-        while (bookCount > 0)
+        foreach (var placeOnScene in placesForBooksList)
         {
-            GameObject currentBookshelf = GameObject.Instantiate(bookshelfPrefab, bookcaseParent);
-            currentBookshelf.transform.localPosition = new Vector2(0.0f, coordinateNewBookshelf);
-            coordinateNewBookshelf -= 4.0f;
+            placesForBooksGetSpawn = placeOnScene.GetComponent<SpawnPoints>();
 
-            randomCountBooksOnBookShelfs = Random.Range(3, 10);
-
-            while (bookCount > 0)
+            for (int i = 0; i < placesForBooksGetSpawn.SpawnPointsList.Count; i++)
             {
-                if (count == randomCountBooksOnBookShelfs) break;
+                countBooksInPlace += placesForBooksGetSpawn.SpawnPointsList[i].booksCount;
+            }
 
-                BookGenerator(currentBookshelf, "The invisiable man", "Gerbert Uals", Random.Range(5, 1000), Random.Range(5, 30));
-                count++;
+            //TODO Надо бы ловить ошибку, если лимит будет привышен. Что в таком случае делать?
+            //Больше мест для книг или ставить ограничение.
+            if (bookCount <= countBooksInPlace)
+            {
+                placeOnScene.SetActive(true);
+                break;
+            }
+            
+            countBooksInPlace = 0;
+        }
+
+        int countBooksInPoint = 0;
+        float shiftPosition = .0f;
+
+        foreach (var point in placesForBooksGetSpawn.SpawnPointsList)
+        {
+            countBooksInPoint = point.booksCount;
+            shiftPosition = .0f;
+
+            while (countBooksInPoint > 0 && bookCount > 0)
+            {
+                shiftPosition += .3f;
+                BookGenerator(point.point, bookCount + " Book name", "Gerbert Uals", Random.Range(5, 1000), Random.Range(5, 30), shiftPosition);
+                countBooksInPoint--;
                 bookCount--;
             }
-            count = 0;
         }
     }
 
-    private void BookGenerator(GameObject currentBookshelf, string bookName = "Book Name", string bookAuthor = "Book Author", float pageCount = 100, float hight = 25)
+    private void BookGenerator(GameObject currentBookshelf, string bookName = "Book Name", string bookAuthor = "Book Author", float pageCount = 100, float hight = 25, float shiftPosition = .0f)
     {
         float bookWidth = 0;
         float bookHeight = 0;
@@ -60,8 +79,9 @@ public class CreateBookshelfs : MonoBehaviour
         GameObject book = GameObject.Instantiate(bookPrefab, currentBookshelf.transform);
         book.GetComponent<BoxCollider2D>().size = new Vector2(bookWidth, bookHeight);
         book.transform.GetChild(0).localScale = new Vector2(bookWidth, bookHeight);
+        book.transform.localPosition = new Vector2(book.transform.localPosition.x + shiftPosition, book.transform.localPosition.y);
         book.transform.GetChild(1).GetComponent<RectTransform>().sizeDelta = new Vector2(bookHeight, bookWidth);
         book.transform.GetChild(1).GetComponent<TextMeshPro>().text = bookName;
-        book.transform.localRotation = Quaternion.Euler(0, 0, 45f);
+        // book.transform.localRotation = Quaternion.Euler(0, 0, 45f);
     }
 }

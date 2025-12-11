@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc385056fd36f44bdac997b4a22afdb6, type: 3}
+  m_Name: PlacesForBooksListFantasy
+  m_EditorClassIdentifier: Assembly-CSharp::PlacesForBooksList
+  placesForBooks:
+  - booksCount: 5
+    Places: {fileID: 3680124693514069728, guid: d0b9ebe799c8943db924a63418d9d7e7, type: 3}
+  - booksCount: 10
+    Places: {fileID: 98414860977279958, guid: 0579750bf14e04f14a23552e72ff9dcf, type: 3}
+  - booksCount: 15
+    Places: {fileID: 98414860977279958, guid: 4fa5a6d877dba4de18508dd25198cf2b, type: 3}
+  - booksCount: 45
+    Places: {fileID: 98414860977279958, guid: 4af6de47df9964d4da02a6c95721c1d5, type: 3}
+  - booksCount: 105
+    Places: {fileID: 98414860977279958, guid: 849e186d718bd407fa42568b05b2fe76, type: 3}
