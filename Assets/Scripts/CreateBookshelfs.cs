@@ -1,15 +1,9 @@
-using NUnit.Framework;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using ScriptableSettings;
 using System.Collections.Generic;
 
 public class CreateBookshelfs : MonoBehaviour
 {
-    [SerializeField]
-    private int bookCount = 26;
-
     [SerializeField]
     private Transform room;
 
@@ -19,9 +13,31 @@ public class CreateBookshelfs : MonoBehaviour
     [SerializeField]
     private List<GameObject> placesForBooksList;
 
+    [SerializeField]
+    private bool IsAddNewBook;
+
+    private SQLite.SQLiteConnection db;
+    LibraryManager libraryManager = new LibraryManager();
+
+
+    private void Awake()
+    {
+        db = libraryManager.Init();
+
+        if (IsAddNewBook)
+        {
+            libraryManager.AddBook(db, "Хоббит, или Туда и обратно", "Джон Р. Р. Толкин", 1937, true, 5);
+        }
+    }
 
     private void Start()
     {
+        libraryManager.CreateTables(db);
+        libraryManager.TestDatabase(db);
+
+        List<Book> booksList = libraryManager.GetBooksTitles(db);
+        // database.RequestToDatabase("");
+
         SpawnPoints placesForBooksGetSpawn = null;
         int countBooksInPlace = 0;
 
@@ -36,7 +52,7 @@ public class CreateBookshelfs : MonoBehaviour
 
             //TODO Надо бы ловить ошибку, если лимит будет привышен. Что в таком случае делать?
             //Больше мест для книг или ставить ограничение.
-            if (bookCount <= countBooksInPlace)
+            if (booksList.Count <= countBooksInPlace)
             {
                 placeOnScene.SetActive(true);
                 break;
@@ -46,6 +62,7 @@ public class CreateBookshelfs : MonoBehaviour
         }
 
         int countBooksInPoint = 0;
+        int booksCount = 0;
         float shiftPosition = .0f;
 
         foreach (var point in placesForBooksGetSpawn.SpawnPointsList)
@@ -53,12 +70,12 @@ public class CreateBookshelfs : MonoBehaviour
             countBooksInPoint = point.booksCount;
             shiftPosition = .0f;
 
-            while (countBooksInPoint > 0 && bookCount > 0)
+            while (countBooksInPoint > 0 && booksCount <= booksList.Count)
             {
                 shiftPosition += .3f;
-                BookGenerator(point.point, bookCount + " Book name", "Gerbert Uals", Random.Range(5, 1000), Random.Range(5, 30), shiftPosition);
+                BookGenerator(point.point, booksList[booksCount].Id + ". " + booksList[booksCount].Title, booksList[booksCount].Author, Random.Range(5, 1000), Random.Range(5, 30), shiftPosition);
                 countBooksInPoint--;
-                bookCount--;
+                booksCount++;
             }
         }
     }
