@@ -70,7 +70,7 @@ public class CreateBookshelfs : MonoBehaviour
             countBooksInPoint = point.booksCount;
             shiftPosition = .0f;
 
-            while (countBooksInPoint > 0 && booksCount <= booksList.Count)
+            while (countBooksInPoint > 0 && booksCount < booksList.Count)
             {
                 shiftPosition += .3f;
                 BookGenerator(point.point, booksList[booksCount].Id + ". " + booksList[booksCount].Title, booksList[booksCount].Author, Random.Range(5, 1000), Random.Range(5, 30), shiftPosition);
