@@ -1,0 +1,46 @@
+{
+    "version": 1,
+    "name": "BookInput",
+    "maps": [
+        {
+            "name": "Book",
+            "id": "539eff28-e283-4871-9695-6e62b91b7915",
+            "actions": [
+                {
+                    "name": "Click",
+                    "type": "Button",
+                    "id": "8673f99b-9ef9-43fc-b9a2-459b92f38437",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "42f52324-f468-4dfa-8853-736fbfe444f7",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6a8f44da-022b-45c2-8a30-0cc277427f1b",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
