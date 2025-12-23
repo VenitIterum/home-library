@@ -54,11 +54,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpawnPoints
   SpawnPointsList:
   - point: {fileID: 7374349591349640395}
-    booksCount: 15
+    booksCount: 30
   - point: {fileID: 9100941348630766737}
-    booksCount: 15
+    booksCount: 30
   - point: {fileID: 5707689832682901316}
-    booksCount: 15
+    booksCount: 30
 --- !u!1 &500377633000696883
 GameObject:
   m_ObjectHideFlags: 0
