@@ -13,4 +13,5 @@ public class PointData
 {
     public GameObject point;
     public int booksCount;
+    public GameObject spawnZone;
 }

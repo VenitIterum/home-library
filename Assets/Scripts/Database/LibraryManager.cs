@@ -111,16 +111,10 @@ namespace Database
         }
         //^DELETE^
 
-        public List<Book> GetBooksTitles(SQLite.SQLiteConnection db)
+        public List<Book> GetBooksList(SQLite.SQLiteConnection db)
         {
             List<string> bookTitle = new List<string>();
-
             var allBooks = db.Table<Book>().ToList();
-
-            // foreach (var book in allBooks)
-            // {
-            //     bookTitle.Add(book.Title);
-            // }
 
             return allBooks;
         }

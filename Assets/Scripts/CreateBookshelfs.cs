@@ -12,8 +12,10 @@ public class CreateBookshelfs : MonoBehaviour
     [SerializeField]
     private GameObject bookPrefab;
 
+    //Будем добывать эту переменную из room (см. выше), а этот список убрать из едитора
+    //и добавлять в него полки из room
     [SerializeField]
-    private List<GameObject> placesForBooksList;
+    private List<GameObject> placesBookshelfList;
 
     [SerializeField]
     private bool IsAddNewBook;
@@ -36,50 +38,73 @@ public class CreateBookshelfs : MonoBehaviour
 
     private void Start()
     {
-        //DELETE
+        bool IsFindFinalBookshelf = false; 
+        int countBooksInBookshelf = 0;
+        GameObject currentBookshelf = null;
+        List<GameObject> activeBookshelfList = new List<GameObject>();
+
+        //For TESTS
         AddDatasToTables();
 
-        List<Book> booksList = libraryManager.GetBooksTitles(db);
+        List<Book> booksList = libraryManager.GetBooksList(db);
+        int booksCountInDatabase = booksList.Count;
 
-        SpawnPoints placesForBooksGetSpawn = null;
-        // GameObject placeForBooks = null;
-        int countBooksInPlace = 0;
+        BookshelfPlace allBookshelfs = null;
 
-        foreach (var placeOnScene in placesForBooksList)
+        foreach (var bookshelfs in placesBookshelfList)
         {
-            placesForBooksGetSpawn = placeOnScene.GetComponent<SpawnPoints>();
+            allBookshelfs = bookshelfs.GetComponent<BookshelfPlace>();
+            SpawnPoints allSpawnPoints = null;
 
-            foreach (var spawnPoint in placesForBooksGetSpawn.SpawnPointsList)
+            foreach (var bookshelf in allBookshelfs.bookshelfList)
             {
-                countBooksInPlace += spawnPoint.booksCount;
-            }
+                currentBookshelf = bookshelf;
+                countBooksInBookshelf = 0; //в дальнейшем тут должна быть длина
+                allSpawnPoints = currentBookshelf.GetComponent<SpawnPoints>();
 
-            //TODO Надо бы ловить ошибку, если лимит будет привышен. Что в таком случае делать?
-            //Больше мест для книг или ставить ограничение.
-            if (booksList.Count <= countBooksInPlace)
-            {
-                // placeForBooks = GameObject.Instantiate(placeOnScene, room);
-                placeOnScene.SetActive(true);
-                break;
+                foreach (var point in allSpawnPoints.SpawnPointsList)
+                {
+                    countBooksInBookshelf += point.booksCount;
+                }
+
+                if (booksCountInDatabase <= countBooksInBookshelf)
+                {
+                    currentBookshelf.SetActive(true);
+                    activeBookshelfList.Add(currentBookshelf);
+                    IsFindFinalBookshelf = true;
+                    break;
+                }
             }
             
-            countBooksInPlace = 0;
+            if (IsFindFinalBookshelf) break;
+
+            currentBookshelf.SetActive(true);
+            activeBookshelfList.Add(currentBookshelf);
+            booksCountInDatabase -= countBooksInBookshelf;
+        }
+
+        if (!IsFindFinalBookshelf)
+        {
+            Debug.LogWarning("Не для всех книг хватило места!");
+            return;
         }
 
         int countBooksInPoint = 0;
         int booksCount = 0;
 
-        // foreach (var point in placeForBooks.GetComponent<SpawnPoints>().SpawnPointsList)
-        foreach (var point in placesForBooksGetSpawn.SpawnPointsList)
+        foreach (var bookshelf in activeBookshelfList)
         {
-            shiftPosition = .0f;
-            countBooksInPoint = point.booksCount;
-            while (countBooksInPoint > 0 && booksCount < booksList.Count)
+            foreach (var point in bookshelf.GetComponent<SpawnPoints>().SpawnPointsList)
             {
-                // BookGenerator(point.point, booksList[booksCount].Title, Random.Range(5, 1000), Random.Range(5, 30), shiftPosition);
-                BookGenerator(point.point, booksList[booksCount].Title, booksList[booksCount].PageCount, booksList[booksCount].BookHight);
-                countBooksInPoint--;
-                booksCount++;
+                shiftPosition = .0f;
+                countBooksInPoint = point.booksCount;
+
+                while (countBooksInPoint > 0 && booksCount < booksList.Count)
+                {
+                    BookGenerator(point.point, booksList[booksCount].Id + ". " + booksList[booksCount].Title, booksList[booksCount].PageCount, booksList[booksCount].BookHight);
+                    countBooksInPoint--;
+                    booksCount++;
+                }
             }
         }
     }
@@ -115,7 +140,7 @@ public class CreateBookshelfs : MonoBehaviour
     {
         if (IsAddNewBook)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
                 libraryManager.AddBook(db, "Тест", 3, Random.Range(1930, 2025), false, Random.Range(0, 5), Random.Range(400, 800), Random.Range(15, 23));
             }
