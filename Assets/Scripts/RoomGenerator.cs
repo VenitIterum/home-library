@@ -4,19 +4,11 @@ using UnityEngine;
 public class RoomGenerator : MonoBehaviour
 {
     [SerializeField]
-    GameObject leftWall;
+    public GameObject leftWall;
     [SerializeField]
-    GameObject rightWall;
+    public GameObject rightWall;
     [SerializeField]
-    GameObject section;
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
+    public GameObject roomSection;
+    [SerializeField]
+    public GameObject sectionPrefab;
 }

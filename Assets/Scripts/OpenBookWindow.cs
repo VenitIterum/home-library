@@ -9,11 +9,6 @@ public class OpenBookWindow : MonoBehaviour
     private SQLite.SQLiteConnection db;
     private LibraryManager libraryManager = new LibraryManager();
 
-    void Awake()
-    {
-        if (db == null) db = libraryManager.Init();
-    }
-
     public void OnBookClicked()
     {
         string currentBookTitle = this.GetComponentInChildren<TextMeshPro>().text;

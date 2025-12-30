@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Database;
 using Database.Tables;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 
 public class CreateBookshelfs : MonoBehaviour
 {
@@ -12,11 +13,6 @@ public class CreateBookshelfs : MonoBehaviour
     [SerializeField]
     private GameObject bookPrefab;
 
-    //Будем добывать эту переменную из room (см. выше), а этот список убрать из едитора
-    //и добавлять в него полки из room
-    [SerializeField]
-    private List<GameObject> placesBookshelfList;
-
     [SerializeField]
     private bool IsAddNewBook;
     
@@ -25,6 +21,10 @@ public class CreateBookshelfs : MonoBehaviour
 
     [SerializeField]
     private bool IsAddNewGenre;
+
+    //Добавлять в него полки из room
+    private List<GameObject> sectionsList = new List<GameObject>();
+    private List<GameObject> placesBookshelfList = new List<GameObject>();
 
     private SQLite.SQLiteConnection db;
     private LibraryManager libraryManager = new LibraryManager();
@@ -39,54 +39,84 @@ public class CreateBookshelfs : MonoBehaviour
     private void Start()
     {
         bool IsFindFinalBookshelf = false; 
-        int countBooksInBookshelf = 0;
         GameObject currentBookshelf = null;
+        BookshelfPlace allBookshelfs = null;
+
         List<GameObject> activeBookshelfList = new List<GameObject>();
+        List<Book> booksList = libraryManager.GetBooksList(db);
+        int booksCountInDatabase = booksList.Count;
+        int countBooksInBookshelf = 0;
 
         //For TESTS
         AddDatasToTables();
 
-        List<Book> booksList = libraryManager.GetBooksList(db);
-        int booksCountInDatabase = booksList.Count;
+        float addValue = -33.4f;
 
-        BookshelfPlace allBookshelfs = null;
-
-        foreach (var bookshelfs in placesBookshelfList)
+        while (!IsFindFinalBookshelf)
         {
-            allBookshelfs = bookshelfs.GetComponent<BookshelfPlace>();
-            SpawnPoints allSpawnPoints = null;
+            GameObject sectionPrefab = room.GetComponent<RoomGenerator>().sectionPrefab;
+            sectionsList.Add(GameObject.Instantiate(sectionPrefab, room.GetComponent<RoomGenerator>().roomSection.transform));
+            Debug.Log($"<color=orange>Количество секций: {sectionsList.Count}</color>");
 
-            foreach (var bookshelf in allBookshelfs.bookshelfList)
-            {
-                currentBookshelf = bookshelf;
-                countBooksInBookshelf = 0; //в дальнейшем тут должна быть длина
-                allSpawnPoints = currentBookshelf.GetComponent<SpawnPoints>();
-
-                foreach (var point in allSpawnPoints.SpawnPointsList)
-                {
-                    countBooksInBookshelf += point.booksCount;
-                }
-
-                if (booksCountInDatabase <= countBooksInBookshelf)
-                {
-                    currentBookshelf.SetActive(true);
-                    activeBookshelfList.Add(currentBookshelf);
-                    IsFindFinalBookshelf = true;
-                    break;
-                }
-            }
+            addValue += 33.4f;
+            sectionsList[sectionsList.Count - 1].transform.localPosition += new Vector3(addValue, .0f, .0f);
+            room.GetComponent<RoomGenerator>().rightWall.transform.localPosition += new Vector3(addValue, .0f, .0f);
             
-            if (IsFindFinalBookshelf) break;
+            foreach (Transform bookshelf in sectionsList[sectionsList.Count - 1].GetComponent<Section>().bookshelfs.transform)
+            {
+                placesBookshelfList.Add(bookshelf.gameObject);
+            }
+            Debug.Log($"<color=magenta>Количество полок: {placesBookshelfList.Count}</color>");
 
-            currentBookshelf.SetActive(true);
-            activeBookshelfList.Add(currentBookshelf);
-            booksCountInDatabase -= countBooksInBookshelf;
+            foreach (var bookshelfs in placesBookshelfList)
+            {
+                allBookshelfs = bookshelfs.GetComponent<BookshelfPlace>();
+                SpawnPoints allSpawnPoints = null;
+
+                foreach (var bookshelf in allBookshelfs.bookshelfList)
+                {
+                    currentBookshelf = bookshelf;
+                    countBooksInBookshelf = 0; //в дальнейшем тут должна быть длина
+                    allSpawnPoints = currentBookshelf.GetComponent<SpawnPoints>();
+
+                    foreach (var point in allSpawnPoints.SpawnPointsList)
+                    {
+                        countBooksInBookshelf += point.booksCount;
+                    }
+
+                    if (booksCountInDatabase <= countBooksInBookshelf)
+                    {
+                        currentBookshelf.SetActive(true);
+                        activeBookshelfList.Add(currentBookshelf);
+                        IsFindFinalBookshelf = true;
+                        break;
+                    }
+                }
+                
+                if (IsFindFinalBookshelf) break;
+
+                currentBookshelf.SetActive(true);
+                activeBookshelfList.Add(currentBookshelf);
+                booksCountInDatabase -= countBooksInBookshelf;
+            }
+
+            //DELETE
+            // if (IsFindFinalBookshelf)
+            // {
+            //     // sectionsList.Add(GameObject.Instantiate(sectionPrefab, room.GetComponent<RoomGenerator>().roomSection.transform));
+            //     // Debug.Log($"<color=orange>Количество секций: {sectionsList.Count}</color>");
+            //     break;
+            // }
+
+            //DELETE
+            Debug.Log($"activeBookshelfList: {activeBookshelfList.Count}");
         }
 
-        if (!IsFindFinalBookshelf)
+        //ТЕСТЫ.
+        //Книги спавнятся в первой секции. Во второй секции не активируются полки
+        foreach (var element in activeBookshelfList)
         {
-            Debug.LogWarning("Не для всех книг хватило места!");
-            return;
+            Debug.Log($"Name: {element.transform.position}");
         }
 
         int countBooksInPoint = 0;
@@ -140,7 +170,7 @@ public class CreateBookshelfs : MonoBehaviour
     {
         if (IsAddNewBook)
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 20; i++)
             {
                 libraryManager.AddBook(db, "Тест", 3, Random.Range(1930, 2025), false, Random.Range(0, 5), Random.Range(400, 800), Random.Range(15, 23));
             }
